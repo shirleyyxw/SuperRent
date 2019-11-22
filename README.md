@@ -7,5 +7,6 @@ Please transfer these three files to the directory you will run SQLPlus from.
 Run the commands 'start project_create_tables.sql' followed by 'start project_insert_row.sql' in SQLPlus, this will load the data for the project.
 
 Step 2: Running the project
+
 Run the 'SuperRent' class and provide credentials to login to Oracle, then a command line UI will be available. 
 
