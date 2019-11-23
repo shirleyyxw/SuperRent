@@ -12,7 +12,7 @@ public class VehicleTypeModel {
     private final float krate;
 
     public VehicleTypeModel(String vtname, String features, int wrate, int drate, int hrate,
-                            int wirate, int dirate, int hirate, int krate) {
+                            int wirate, int dirate, int hirate, float krate) {
         this.vtname = vtname;
         this.features = features;
         this.wrate = wrate;

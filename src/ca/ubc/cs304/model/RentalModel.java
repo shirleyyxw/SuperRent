@@ -5,7 +5,7 @@ import java.util.Date;
 public class RentalModel {
     private final int rid;
     private final String vlicense;
-    private final String dlicense;
+    private final int dlicense;
     private final int odometer;
     private final String cardName;
     private final int cardNo;
@@ -14,7 +14,7 @@ public class RentalModel {
     private final Date toDate;
     private final int confNo;
 
-    public RentalModel(int rid, String vlicense, String dlicense, int odometer, String cardName,
+    public RentalModel(int rid, String vlicense, int dlicense, int odometer, String cardName,
                        int cardNo, Date expDate, Date fromDate, Date toDate, int confNo) {
         this.rid = rid;
         this.vlicense = vlicense;
@@ -36,7 +36,7 @@ public class RentalModel {
         return vlicense;
     }
 
-    public String getDlicense() {
+    public int getDlicense() {
         return dlicense;
     }
 
