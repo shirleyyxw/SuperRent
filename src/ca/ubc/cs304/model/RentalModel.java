@@ -1,7 +1,5 @@
 package ca.ubc.cs304.model;
 
-import java.util.Date;
-
 public class RentalModel {
     private final int rid;
     private final String vlicense;
@@ -9,13 +7,13 @@ public class RentalModel {
     private final int odometer;
     private final String cardName;
     private final int cardNo;
-    private final Date expDate;
-    private final Date fromDate;
-    private final Date toDate;
+    private final String expDate;
+    private final String fromDate;
+    private final String toDate;
     private final int confNo;
 
     public RentalModel(int rid, String vlicense, int dlicense, int odometer, String cardName,
-                       int cardNo, Date expDate, Date fromDate, Date toDate, int confNo) {
+                       int cardNo, String expDate, String fromDate, String toDate, int confNo) {
         this.rid = rid;
         this.vlicense = vlicense;
         this.dlicense = dlicense;
@@ -52,15 +50,15 @@ public class RentalModel {
         return cardNo;
     }
 
-    public Date getExpDate() {
+    public String getExpDate() {
         return expDate;
     }
 
-    public Date getFromDate() {
+    public String getFromDate() {
         return fromDate;
     }
 
-    public Date getToDate() {
+    public String getToDate() {
         return toDate;
     }
 

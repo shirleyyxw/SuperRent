@@ -7,13 +7,13 @@ Insert into VehicleType values('Fullsize', 'navigation system', 450, 90, 30, 120
 Insert into VehicleType values('SUV', 'navigation system', 500, 100, 35, 130, 45, 25, 3);
 Insert into VehicleType values('Truck', 'backup camera', 550, 110, 40, 140, 50, 30, 3.5);
 
-Insert into Vehicle values('ABC-101', 'Toyota', 'Prius', 2015, 'grey', 20000, 'available', 'Economy', '2525 WestMall in front of starbucks', 'Vancouver');
+Insert into Vehicle values('ABC-101', 'Toyota', 'Prius', 2015, 'grey', 20000, 'rented', 'Economy', '2525 WestMall in front of starbucks', 'Vancouver');
 Insert into Vehicle values('ABC-102', 'Toyota', 'Prius', 2015, 'grey', 20000, 'available', 'Economy', '2525 WestMall in front of starbucks', 'Vancouver');
 Insert into Vehicle values('ABC-103', 'Toyota', 'Prius', 2015, 'grey', 20000, 'available', 'Economy', '2525 WestMall in front of starbucks', 'Vancouver');
 Insert into Vehicle values('ABC-104', 'Toyota', 'Prius', 2015, 'grey', 20000, 'available', 'Mid-size', '2525 WestMall in front of starbucks', 'Vancouver');
 Insert into Vehicle values('ABC-105', 'Toyota', 'Prius', 2015, 'grey', 20000, 'available', 'Fullsize', '2525 WestMall in front of starbucks', 'Vancouver');
 Insert into Vehicle values('ABC-106', 'Toyota', 'Prius', 2015, 'grey', 20040, 'available', 'Compact', '2525 WestMall in front of starbucks', 'Vancouver');
-Insert into Vehicle values('ABC-107', 'Toyota', 'Camry', 2017, 'white', 1000, 'available', 'SUV', '2525 WestMall in front of starbucks', 'Vancouver');
+Insert into Vehicle values('ABC-107', 'Toyota', 'Camry', 2017, 'white', 1000, 'rented', 'SUV', '2525 WestMall in front of starbucks', 'Vancouver');
 Insert into Vehicle values('ABC-108', 'Toyota', 'Camry', 2017, 'grey', 5000, 'available', 'Truck', '2525 WestMall in front of starbucks', 'Vancouver');
 Insert into Vehicle values('ABC-109', 'Toyota', 'Prius', 2015, 'black', 234521, 'available', 'Standard', '1680 EastMall Parking', 'Vancouver');
 Insert into Vehicle values('ABC-110', 'Toyota', 'Prius Plus', 2016, 'black', 0, 'maintenance', 'SUV', '1680 EastMall Parking', 'Vancouver');
@@ -21,7 +21,7 @@ Insert into Vehicle values('ABC-111', 'Toyota', 'Prius', 2015, 'black', 234521, 
 Insert into Vehicle values('ABC-112', 'Toyota', 'Avalon', 2013, 'red', 30000, 'available', 'Mid-size', '1680 EastMall Parking', 'Vancouver');
 Insert into Vehicle values('ABC-113', 'Toyota', 'Prius', 2014, 'blue', 5600, 'available', 'Fullsize', '1680 EastMall Parking', 'Vancouver');
 Insert into Vehicle values('ABC-114', 'Toyota', 'Prius c', 2013, 'black', 4300, 'available', 'Fullsize', '1680 EastMall Parking', 'Vancouver');
-Insert into Vehicle values('ABC-115', 'Toyota', 'HighLander', 2015, 'grey', 34000, 'available', 'Compact', '1680 EastMall Parking', 'Vancouver');
+Insert into Vehicle values('ABC-115', 'Toyota', 'HighLander', 2015, 'grey', 34000, 'rented', 'Compact', '1680 EastMall Parking', 'Vancouver');
 Insert into Vehicle values('ABC-116', 'Toyota', 'Prius', 2015, 'black', 234521, 'available', 'Compact', '1680 EastMall Parking', 'Vancouver');
 Insert into Vehicle values('ABC-117', 'Toyota', 'Prius', 2015, 'black', 234521, 'available', 'Truck', '1680 EastMall Parking', 'Vancouver');
 
@@ -49,7 +49,7 @@ Insert into Reservation values (99999999, 'Compact', 1000009, TO_DATE('18-DEC-20
 Insert into Reservation values (12121212, 'Mid-size', 1000010, TO_DATE('01-JAN-2020 13:35:00', 'DD-MON-YYYY HH24:MI:SS'), TO_DATE('15-JAN-2019 13:35:00', 'DD-MON-YYYY HH24:MI:SS'));
 Insert into Reservation values (13131313, 'Standard', 1000010, TO_DATE('02-DEC-2019 13:35:00', 'DD-MON-YYYY HH24:MI:SS'), TO_DATE('05-DEC-2019 13:35:00', 'DD-MON-YYYY HH24:MI:SS'));
 
-Insert into Rental values(10001, 'ABC-101', 1000001, 20000, 'MasterCard', 123456, TO_DATE('01-NOV-2022', 'DD-MON-YYYY'), TO_DATE('01-NOV-2019 13:35:00', 'DD-MON-YYYY HH24:MI:SS'), TO_DATE('01-DEC-2019 13:35:00', 'DD-MON-YYYY HH24:MI:SS'), 11111111);
+Insert into Rental values(10001, 'ABC-101', 1000001, 20000, 'MasterCard', 123456, TO_DATE('01-NOV-2022', 'DD-MON-YYYY'), TO_DATE('01-NOV-2019 13:35:00', 'DD-MON-YYYY HH24:MI:SS'), TO_DATE('10-DEC-2019 13:35:00', 'DD-MON-YYYY HH24:MI:SS'), 11111111);
 Insert into Rental values(10002, 'ABC-115', 1000002, 34000, 'Visa', 234567, TO_DATE('01-NOV-2023', 'DD-MON-YYYY'), TO_DATE('01-NOV-2019 08:31:00', 'DD-MON-YYYY HH24:MI:SS'), TO_DATE('01-DEC-2019 09:12:00', 'DD-MON-YYYY HH24:MI:SS'), 22222222);
 Insert into Rental values(10003, 'ABC-107', 1000006, 1000, 'Visa', 345678, TO_DATE('15-JAN-2023', 'DD-MON-YYYY'), TO_DATE('01-NOV-2019 08:00:00', 'DD-MON-YYYY HH24:MI:SS'), TO_DATE('01-DEC-2019 15:00:00', 'DD-MON-YYYY HH24:MI:SS'), 66666666);
 Insert into Rental values(10004, 'ABC-109', 1000004, 234521, 'MasterCard', 456789, TO_DATE('15-JAN-2023', 'DD-MON-YYYY'),  TO_DATE('01-OCT-2019 20:00:00', 'DD-MON-YYYY HH24:MI:SS'), TO_DATE('10-OCT-2019 20:00:00', 'DD-MON-YYYY HH24:MI:SS'), 44444444);

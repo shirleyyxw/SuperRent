@@ -1,15 +1,13 @@
 package ca.ubc.cs304.model;
 
-import java.util.Date;
-
 public class ReservationModel {
     private final int confNo;
     private final String vtname;
     private final int dlicense;
-    private final Date fromDate;
-    private final Date toDate;
+    private final String fromDate;
+    private final String toDate;
 
-    public ReservationModel(int confNo, String vtname, int dlicense, Date fromDate, Date toDate) {
+    public ReservationModel(int confNo, String vtname, int dlicense, String fromDate, String toDate) {
         this.confNo = confNo;
         this.vtname = vtname;
         this.dlicense = dlicense;
@@ -23,7 +21,7 @@ public class ReservationModel {
 
     public int getDlicense() {return dlicense;}
 
-    public Date getFromDate() {return fromDate;}
+    public String getFromDate() {return fromDate;}
 
-    public Date getToDate() {return toDate;}
+    public String getToDate() {return toDate;}
 }

@@ -1,11 +1,14 @@
 package ca.ubc.cs304.ui;
 
+import ca.ubc.cs304.delegates.TerminalTransactionsDelegate;
+import ca.ubc.cs304.model.BranchModel;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import ca.ubc.cs304.delegates.TerminalTransactionsDelegate;
-import ca.ubc.cs304.model.BranchModel;
+import java.text.ParseException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 
 /**
  * The class is only responsible for handling terminal text inputs. 
@@ -87,7 +90,74 @@ public class TerminalTransactions {
 		}		
 	}
 
-    private void handleViewVehiclesOption() {}
+    private void handleViewVehiclesOption() {
+	    // TODO: consider checking whether car type, location, city is in the database
+        System.out.println("Please provide the car type, location&city, and time interval you wish to search on, you can choose to leave any of them blank.");
+        System.out.print("Please enter the car type you wish to view for available vehicles: ");
+        String vtname = readLine().trim();
+        if (vtname.length() == 0) {
+            vtname = null;
+        }
+
+        System.out.print("Please enter the location you wish to view for available vehicles: ");
+        String location = readLine().trim();
+        if (location.length() == 0) {
+            location = null;
+        }
+
+        System.out.print("Please enter the city you wish to view for available vehicles: ");
+        String city = readLine().trim();
+        if (city.length() == 0) {
+            city = null;
+        }
+
+        System.out.print("Please enter the start time (DD-MON-YYYY HH24:MI:SS) you wish to view for available vehicles: ");
+        String startTime = readLine().trim();
+        if (startTime.length() == 0) {
+            startTime = null;
+        } else {
+            String pattern = "dd-MMM-YYYY HH:mm:ss";
+            while(!isTimeInValidFormat(startTime, pattern)) {
+                System.out.print("Please enter the start time (DD-MON-YYYY HH24:MI:SS) you wish to view for available vehicles: ");
+                startTime = readLine().trim();
+            }
+        }
+
+        System.out.print("Please enter the end time (DD-MON-YYYY HH24:MI:SS) you wish to view for available vehicles: ");
+        String endTime = readLine().trim();
+        if (endTime.length() == 0) {
+            endTime = null;
+        } else {
+            String pattern = "dd-MMM-YYYY HH:mm:ss";
+            while(!isTimeInValidFormat(endTime, pattern)) {
+                System.out.print("Please enter the end time (DD-MON-YYYY HH24:MI:SS) you wish to view for available vehicles: ");
+                endTime = readLine().trim();
+            }
+        }
+
+        delegate.countAvailableVehicles(vtname, location, city, startTime);
+        //TODO: figure out how to display the count, then provide an option to view the details of vehicles.
+
+
+    }
+
+
+    // Helper method to validate the format of dateTime inputs
+    private Boolean isTimeInValidFormat(String time, String pattern) {
+        SimpleDateFormat format = new SimpleDateFormat(pattern);
+        format.setLenient(false);
+        try {
+            ParsePosition p = new ParsePosition(0);
+            format.parse(time, p);
+            if (p.getIndex() < time.length()){
+                throw new ParseException(time, p.getIndex());
+            }
+            return true;
+        } catch (ParseException e) {
+            System.out.println(time+ " does not follow the format DD-MON-YYYY HH24:MI:SS. Please try again.");
+            return false;
+        }
+    }
 
     private void handleReservationOption() {}
 
