@@ -154,7 +154,7 @@ public class TerminalTransactions {
             }
             return true;
         } catch (ParseException e) {
-            System.out.println(time+ " does not follow the format DD-MON-YYYY HH24:MI:SS. Please try again.");
+            System.out.println(time+ " does not follow the format " + pattern + " Please try again.");
             return false;
         }
     }
