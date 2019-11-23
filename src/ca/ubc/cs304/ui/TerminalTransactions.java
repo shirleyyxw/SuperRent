@@ -31,14 +31,20 @@ public class TerminalTransactions {
 	    bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 		int choice = INVALID_INPUT;
 		
-		while (choice != 5) {
+		while (choice != 9) {
 			System.out.println();
-			System.out.println("1. Insert branch");
-			System.out.println("2. Delete branch");
-			System.out.println("3. Update branch name");
-			System.out.println("4. Show branch");
-			System.out.println("5. Quit");
-			System.out.print("Please choose one of the above 5 options: ");
+			System.out.println("Customer:");
+			System.out.println("1. View available vehicles");
+			System.out.println("2. Make reservation");
+			System.out.println("Clerk:");
+			System.out.println("3. Renting a vehicle");
+			System.out.println("4. Returning a vehicle");
+			System.out.println("5. Generate daily rentals report");
+			System.out.println("6. Generate daily rentals for branch report");
+			System.out.println("7. Generate daily returns report");
+			System.out.println("8. Generate daily returns for branch report");
+			System.out.println("9. Quit");
+			System.out.print("Please choose one of the above 9 options: ");
 
 			choice = readInteger(false);
 
@@ -47,20 +53,32 @@ public class TerminalTransactions {
 			if (choice != INVALID_INPUT) {
 				switch (choice) {
 				case 1:  
-					handleInsertOption(); 
+					handleViewVehiclesOption();
 					break;
 				case 2:  
-					handleDeleteOption(); 
+					handleReservationOption();
 					break;
 				case 3: 
-					handleUpdateOption();
+					handleRentOption();
 					break;
 				case 4:  
-					delegate.showBranch(); 
+					handleReturn();
 					break;
 				case 5:
-					handleQuitOption();
+					delegate.generateRentalsReport();
 					break;
+					case 6:
+						handleRentalsBranchReportOption();
+						break;
+					case 7:
+						delegate.generateReturnsReport();
+						break;
+					case 8:
+						handleReturnsBranchReportOption();
+						break;
+					case 9:
+						handleQuitOption();
+						break;
 				default:
 					System.out.println(WARNING_TAG + " The number that you entered was not a valid option.");
 					break;
@@ -68,7 +86,42 @@ public class TerminalTransactions {
 			}
 		}		
 	}
-	
+
+    private void handleViewVehiclesOption() {}
+
+    private void handleReservationOption() {}
+
+    private void handleRentOption() {}
+
+    private void handleReturn() {}
+
+    private void handleRentalsBranchReportOption() {
+	    String[] result = getCityAndLocation("rentals");
+        delegate.generateRentalsBranchReport(result[0], result[1]);
+    }
+
+	private void handleReturnsBranchReportOption() {
+        String[] result = getCityAndLocation("returns");
+        delegate.generateReturnsBranchReport(result[0], result[1]);
+    }
+
+    // helper method for handleRentalsBranchReportOption and handleReturnsBranchReportOption
+    // return a string array with result[0] = location, result[1] = city
+    private String[] getCityAndLocation(String reportName) {
+        String city = null;
+        while (city == null || city.length() <= 0) {
+            System.out.print("Please enter the city of the branch you wish to generate " + reportName + " report for: ");
+            city = readLine().trim();
+        }
+        String location = null;
+        while (location == null || location.length() <= 0) {
+            System.out.print("Please enter the location of the branch you wish to generate " + reportName + " report for: ");
+            location = readLine().trim();
+        }
+        String[] result = {location, city};
+        return result;
+    }
+
 	private void handleDeleteOption() {
 		int branchId = INVALID_INPUT;
 		while (branchId == INVALID_INPUT) {
