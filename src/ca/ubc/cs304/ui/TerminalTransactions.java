@@ -68,13 +68,13 @@ public class TerminalTransactions {
 					handleReturn();
 					break;
 				case 5:
-					delegate.generateRentalsReport();
+					handleRentalsReportOption();
 					break;
 					case 6:
 						handleRentalsBranchReportOption();
 						break;
 					case 7:
-						delegate.generateReturnsReport();
+						handleReturnsReportOption();
 						break;
 					case 8:
 						handleReturnsBranchReportOption();
@@ -135,9 +135,6 @@ public class TerminalTransactions {
             }
         }
 
-        delegate.countAvailableVehicles(vtname, location, city, startTime);
-        //TODO: figure out how to display the count, then provide an option to view the details of vehicles.
-
 
     }
 
@@ -165,17 +162,40 @@ public class TerminalTransactions {
 
     private void handleReturn() {}
 
+	private void handleRentalsReportOption() {
+		String date = getDateForReport("rentals");
+		delegate.generateRentalsReport(date);
+	}
+
     private void handleRentalsBranchReportOption() {
+		String date = getDateForReport("rentals for branch");
 	    String[] result = getCityAndLocation("rentals");
-        delegate.generateRentalsBranchReport(result[0], result[1]);
+        delegate.generateRentalsBranchReport(date, result[0], result[1]);
     }
+
+	private void handleReturnsReportOption() {
+		String date = getDateForReport("returns");
+		delegate.generateReturnsReport(date);
+	}
 
 	private void handleReturnsBranchReportOption() {
+		String date = getDateForReport("returns for branch");
         String[] result = getCityAndLocation("returns");
-        delegate.generateReturnsBranchReport(result[0], result[1]);
+        delegate.generateReturnsBranchReport(date, result[0], result[1]);
     }
 
-    // helper method for handleRentalsBranchReportOption and handleReturnsBranchReportOption
+    // helper method for report options to get the date of report
+    private String getDateForReport(String reportName) {
+		String date = null;
+		String pattern = "dd-MMM-YYYY";
+		while (date == null || date.length() <= 0 || !isTimeInValidFormat(date, pattern)) {
+			System.out.print("Please enter the date you wish to generate " + reportName + " report for (eg. 01-JAN-2019): ");
+			date = readLine().trim();
+		}
+		return date;
+	}
+
+    // helper method for handleRentalsBranchReportOption and handleReturnsBranchReportOption to get the branch
     // return a string array with result[0] = location, result[1] = city
     private String[] getCityAndLocation(String reportName) {
         String city = null;

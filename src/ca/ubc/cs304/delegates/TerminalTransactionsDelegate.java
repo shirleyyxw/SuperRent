@@ -16,10 +16,10 @@ public interface TerminalTransactionsDelegate {
 	void insertBranch(BranchModel model);
 	void showBranch();
 	void updateBranch(int branchId, String name);
-	void generateRentalsReport();
-	void generateRentalsBranchReport(String location, String city);
-	void generateReturnsReport();
-	void generateReturnsBranchReport(String location, String city);
+	void generateRentalsReport(String date);
+	void generateRentalsBranchReport(String date, String location, String city);
+	void generateReturnsReport(String date);
+	void generateReturnsBranchReport(String date, String location, String city);
 	
-	public void terminalTransactionsFinished();
+	void terminalTransactionsFinished();
 }

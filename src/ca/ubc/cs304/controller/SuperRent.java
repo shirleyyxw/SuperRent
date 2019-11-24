@@ -7,6 +7,8 @@ import ca.ubc.cs304.model.BranchModel;
 import ca.ubc.cs304.ui.LoginWindow;
 import ca.ubc.cs304.ui.TerminalTransactions;
 
+import java.util.ArrayList;
+
 /**
  * This is the main controller class that will orchestrate everything.
  */
@@ -48,10 +50,39 @@ public class SuperRent implements LoginWindowDelegate, TerminalTransactionsDeleg
 		}
 	}
 
-	public void generateRentalsReport(){}
-	public void generateRentalsBranchReport(String location, String city){}
-	public void generateReturnsReport(){}
-	public void generateReturnsBranchReport(String location, String city){}
+	public void generateRentalsReport(String date){
+		printReport(dbHandler.generateRentalsReport(date), "Daily Rentals Report:");
+	}
+
+	public void generateRentalsBranchReport(String date, String location, String city){
+		printReport(dbHandler.generateRentalsBranchReport(date, location, city), "Daily Rentals for Branch Report:");
+	}
+
+	public void generateReturnsReport(String date){
+		printReport(dbHandler.generateReturnsReport(date), "Daily Returns Report:");
+	}
+
+	public void generateReturnsBranchReport(String date, String location, String city){
+		printReport(dbHandler.generateReturnsBranchReport(date, location, city), "Daily Returns for Branch Report:");
+	}
+
+	// helper method for printing reports
+    // prints error message if the requested branch does not exist
+	private void printReport(ArrayList<ArrayList<String>> result, String reportName) {
+        System.out.println();
+	    if (result == null) {
+            System.out.print("Error: The entered branch does not exist.");
+        } else {
+            System.out.print(reportName);
+            for(int i = 0; i < result.size(); i++) {
+                System.out.println();
+                for(int j = 0; j < result.get(i).size(); j++) {
+                    System.out.printf("%-25s", result.get(i).get(j));
+                }
+            }
+        }
+        System.out.println();
+	}
 	
 	/**
 	 * TermainalTransactionsDelegate Implementation
