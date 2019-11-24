@@ -14,7 +14,7 @@ create table Vehicle (
 	vlicense varchar(10) not null PRIMARY KEY,
 	make varchar(30),
 	model varchar(20),
-	year integer,
+	productionYear integer,
 	color varchar(10),
 	odometer integer,
 	status varchar(20) not null check (status in ('rented', 'available', 'maintenance')),
@@ -63,9 +63,8 @@ create table Return (
 	returnTime date not null,
 	odometer integer not null,
 	fulltank varchar(10) not null check (fulltank in ('True', 'False')),
-	value Number not null,
+	payment Number not null,
 	foreign key (rid) references Rental
 );
 
 commit;
-
