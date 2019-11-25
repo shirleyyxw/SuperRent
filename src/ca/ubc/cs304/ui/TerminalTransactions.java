@@ -2,6 +2,7 @@ package ca.ubc.cs304.ui;
 
 import ca.ubc.cs304.delegates.TerminalTransactionsDelegate;
 import ca.ubc.cs304.model.BranchModel;
+import ca.ubc.cs304.model.CustomerModel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -91,73 +92,153 @@ public class TerminalTransactions {
 		}		
 	}
 
-    private void handleViewVehiclesOption() {
-	    // TODO: consider checking whether car type, location, city is in the database
-        System.out.println("Please provide the car type, location&city, and time interval you wish to search on, you can choose to leave any of them blank.");
-        System.out.print("Please enter the car type you wish to view for available vehicles: ");
-        String vtname = readLine().trim();
-        if (vtname.length() == 0) {
-            vtname = null;
-        }
+	private void handleViewVehiclesOption() {
+		System.out.println("\nPlease provide the car type, location&city, and time interval you wish to search on, you can choose to leave any of them blank.\n");
+		System.out.print("Please enter the car type you wish to view for available vehicles: ");
+		String vtname = readLine().trim();
+		if (vtname.length() == 0) {
+			vtname = null;
+		}
 
-        System.out.print("Please enter the location you wish to view for available vehicles: ");
-        String location = readLine().trim();
-        if (location.length() == 0) {
-            location = null;
-        }
+		System.out.print("Please enter the location you wish to view for available vehicles: ");
+		String location = readLine().trim();
+		if (location.length() == 0) {
+			location = null;
+		}
 
-        System.out.print("Please enter the city you wish to view for available vehicles: ");
-        String city = readLine().trim();
-        if (city.length() == 0) {
-            city = null;
-        }
+		System.out.print("Please enter the city you wish to view for available vehicles: ");
+		String city = readLine().trim();
+		if (city.length() == 0) {
+			city = null;
+		}
 
-        System.out.print("Please enter the start time (DD-MON-YYYY HH24:MI:SS) you wish to view for available vehicles: ");
-        String startTime = readLine().trim();
-        if (startTime.length() == 0) {
-            startTime = null;
-        } else {
-            String pattern = "dd-MMM-YYYY HH:mm:ss";
-            while(!isTimeInValidFormat(startTime, pattern)) {
-                System.out.print("Please enter the start time (DD-MON-YYYY HH24:MI:SS) you wish to view for available vehicles: ");
-                startTime = readLine().trim();
-            }
-        }
+		System.out.print("Please enter the start time (DD-MON-YYYY HH24:MI:SS e.g. 01-JAN-2019 23:00:00) you wish to view for available vehicles: ");
+		String startTime = readLine().trim();
+		if (startTime.length() == 0) {
+			startTime = null;
+		} else {
+			String pattern = "dd-MMM-YYYY HH:mm:ss";
+			while (!isTimeInValidFormat(startTime, pattern)) {
+				System.out.print("Please enter the start time (DD-MON-YYYY HH24:MI:SS e.g. 01-JAN-2019 23:00:00) you wish to view for available vehicles: ");
+				startTime = readLine().trim();
+			}
+		}
 
-        System.out.print("Please enter the end time (DD-MON-YYYY HH24:MI:SS) you wish to view for available vehicles: ");
-        String endTime = readLine().trim();
-        if (endTime.length() == 0) {
-            endTime = null;
-        } else {
-            String pattern = "dd-MMM-YYYY HH:mm:ss";
-            while(!isTimeInValidFormat(endTime, pattern)) {
-                System.out.print("Please enter the end time (DD-MON-YYYY HH24:MI:SS) you wish to view for available vehicles: ");
-                endTime = readLine().trim();
-            }
-        }
+		System.out.print("Please enter the end time (DD-MON-YYYY HH24:MI:SS e.g. 01-JAN-2019 23:00:00) you wish to view for available vehicles: ");
+		String endTime = readLine().trim();
+		if (endTime.length() == 0) {
+			endTime = null;
+		} else {
+			String pattern = "dd-MMM-YYYY HH:mm:ss";
+			while (!isTimeInValidFormat(endTime, pattern)) {
+				System.out.print("Please enter the end time (DD-MON-YYYY HH24:MI:SS e.g. 01-JAN-2019 23:00:00) you wish to view for available vehicles: ");
+				endTime = readLine().trim();
+			}
+		}
+
+		delegate.countAvailableVehicles(vtname, location, city, startTime);
+		System.out.print("If you wish to view the details of available vehicles enter Y, otherwise enter N: ");
+		String YorN = readLine().trim();
+		if (YorN.equals("Y")) {
+			delegate.displayAvailableVehicles(vtname, location, city, startTime);
+		}
+	}
 
 
-    }
+	// Helper method to validate the format of dateTime inputs
+	private Boolean isTimeInValidFormat(String time, String pattern) {
+		SimpleDateFormat format = new SimpleDateFormat(pattern);
+		format.setLenient(false);
+		try {
+			ParsePosition p = new ParsePosition(0);
+			format.parse(time, p);
+			if (p.getIndex() < time.length()) {
+				throw new ParseException(time, p.getIndex());
+			}
+			return true;
+		} catch (ParseException e) {
+			System.out.println(time + " does not follow the format " + pattern + " Please try again.");
+			return false;
+		}
+	}
+
+	private void handleReservationOption() {
+		System.out.println("\nTo make a reservation, please provide the following information: \n");
+
+		String city = null;
+		while (city == null || city.length() <= 0) {
+			System.out.print("Please enter the city you wish to pick up the vehicle: ");
+			city = readLine().trim();
+		}
+
+		String location = null;
+		while (location == null || location.length() <= 0) {
+			System.out.print("Please enter the location you wish to pick up the vehicle: ");
+			location = readLine().trim();
+		}
 
 
-    // Helper method to validate the format of dateTime inputs
-    private Boolean isTimeInValidFormat(String time, String pattern) {
-        SimpleDateFormat format = new SimpleDateFormat(pattern);
-        format.setLenient(false);
-        try {
-            ParsePosition p = new ParsePosition(0);
-            format.parse(time, p);
-            if (p.getIndex() < time.length()){
-                throw new ParseException(time, p.getIndex());
-            }
-            return true;
-        } catch (ParseException e) {
-            System.out.println(time+ " does not follow the format " + pattern + " Please try again.");
-            return false;
-        }
-    }
+		String vtname = null;
+		while (vtname == null || vtname.length() <= 0) {
+			System.out.print("Please enter the car type you wish to reserve: ");
+			vtname = readLine().trim();
+		}
 
-    private void handleReservationOption() {}
+		int dlicense = INVALID_INPUT;
+		while (dlicense == INVALID_INPUT) {
+			System.out.print("Please enter your driver license number: ");
+			dlicense = readInteger(false);
+		}
+
+		String pattern = "dd-MMM-YYYY HH:mm:ss";
+		String fromDate = null;
+		while (fromDate == null || fromDate.length() <= 0 || !isTimeInValidFormat(fromDate, pattern)) {
+			System.out.print("Please enter the time (DD-MON-YYYY HH24:MI:SS e.g. 01-JAN-2019 23:00:00) you wish to pick up the vehicle: ");
+			fromDate = readLine().trim();
+		}
+
+		String toDate = null;
+		while (toDate == null || toDate.length() <= 0 || !isTimeInValidFormat(toDate, pattern)) {
+			System.out.print("Please enter the time (DD-MON-YYYY HH24:MI:SS e.g. 01-JAN-2019 23:00:00) you wish to return the vehicle: ");
+			toDate = readLine().trim();
+		}
+
+		if (delegate.findCustomer(dlicense) == 0) {
+			System.out.println();
+			System.out.println("Sorry, you are not registered with SuperRent. In order to make a reservation, you need to be a registered member.");
+			System.out.print("Please enter Y if you want to be registered into our System. Otherwise enter N and you will be taken back to the main menu: ");
+			String YorN = readLine().trim();
+			if (!YorN.equals("Y")) return;
+			System.out.println();
+
+			String name = null;
+			while (name == null || name.length() <= 0) {
+				System.out.print("Great. Please enter your name: ");
+				name = readLine().trim();
+			}
+
+			System.out.print("Please enter your phone number (optional) (e.g (604)-000-000): ");
+			String cellphone = readLine().trim();
+			if (cellphone.length() == 0) {
+				cellphone = null;
+			}
+
+			System.out.print("Please enter your address (optional): ");
+			String address = readLine().trim();
+			if (address.length() == 0) {
+				address = null;
+			}
+
+			System.out.println("Thank you " + name +  ", we will be adding you to our system.");
+			CustomerModel model = new CustomerModel(dlicense, cellphone, name, address);
+			delegate.addNewCustomer(model);
+
+		}
+
+		if (delegate.countAvailableVehicles(vtname, location, city, fromDate) != 0) {
+			delegate.reserveVehicle(vtname, dlicense, fromDate, toDate, location, city);
+		}
+	}
 
     private void handleRentOption() {}
 
