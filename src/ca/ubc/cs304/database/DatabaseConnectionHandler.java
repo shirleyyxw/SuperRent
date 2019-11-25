@@ -6,7 +6,9 @@ import ca.ubc.cs304.model.ReservationModel;
 import ca.ubc.cs304.model.VehicleModel;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * This class handles all database related transactions
@@ -38,6 +40,209 @@ public class DatabaseConnectionHandler {
 		}
 	}
 
+	public ArrayList<ArrayList<String>> returnVehicle(String vlicense, int afterOdometer, boolean fulltank, String currentDateStr, Date currentDate) {
+		ArrayList<ArrayList<String>> result = new ArrayList<>();
+		try {
+			String allReturnRid = "(SELECT rid FROM Return)";
+			PreparedStatement ps1 = connection.prepareStatement("SELECT Rental.rid, fromDate, confno FROM Rental WHERE vlicense = ? AND fromDate < TO_DATE(?, 'DD-MON-YYYY HH24:MI:SS') AND Rental.rid NOT IN " + allReturnRid,
+					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+			ps1.setString(1, vlicense);
+			ps1.setString(2, currentDateStr);
+			ResultSet rs1 = ps1.executeQuery();
+
+			// check error
+			int rowcount = 0;
+			if (rs1.last()) {
+				rowcount = rs1.getRow();
+				rs1.beforeFirst();
+			}
+			if (rowcount == 0) {
+				// no such vehicle
+				ArrayList<String> temp = new ArrayList<>();
+				temp.add("ERROR: This vehicle with license " + vlicense + " is either not rented or returned already.");
+				result.add(temp);
+				return result;
+			} else if (rowcount > 1) {
+				ArrayList<String> temp = new ArrayList<>();
+				temp.add("ERROR: There should not be more than one rental with same vlicense that has not returned.");
+				result.add(temp);
+				return result;
+			}
+
+			int rid = 0;
+			Timestamp fromDate = null;
+			String fromDateStr = "";
+			int confNo = 0;
+			while (rs1.next()) {
+				rid = rs1.getInt("rid");
+				SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-YYYY HH:mm:ss");
+				formatter.setLenient(false);
+				fromDate = rs1.getTimestamp("fromDate");
+				System.out.print(fromDate + "\n");
+				fromDateStr = formatter.format(fromDate);
+				System.out.print(fromDateStr + "\n");
+				// fromDate = formatter.parse(fromDateStr, new ParsePosition(0));
+				// System.out.print(fromDate + "\n");
+				confNo = rs1.getInt("confNo");
+			}
+			String vtname = getVtname(confNo);
+
+			ArrayList<String> spacing = new ArrayList<>();
+			spacing.add(" ");
+			ArrayList<String> title = new ArrayList<>();
+			title.add("Receipt for returning: ");
+			result.add(spacing);
+			result.add(title);
+			result.add(spacing);
+			ArrayList<String> columnRow1 = new ArrayList<>();
+			ArrayList<String> dataRow1 = new ArrayList<>();
+			columnRow1.add("Confirmation number");
+			dataRow1.add(Integer.toString(confNo));
+			columnRow1.add("Rental id");
+			dataRow1.add(Integer.toString(rid));
+			columnRow1.add("Rental date");
+			dataRow1.add(fromDateStr);
+			columnRow1.add("Return date");
+			dataRow1.add(currentDateStr);
+			columnRow1.add("Vehicle Type");
+			dataRow1.add(vtname);
+			result.add(columnRow1);
+			result.add(dataRow1);
+
+			PreparedStatement ps2 = connection.prepareStatement("SELECT wrate, drate, hrate, wirate, dirate, hirate FROM VehicleType WHERE vtname = ?");
+			ps2.setString(1, vtname);
+			ResultSet rs2 = ps2.executeQuery();
+			int wrate = 0;
+			int drate = 0;
+			int hrate = 0;
+			int wirate = 0;
+			int dirate = 0;
+			int hirate = 0;
+			while(rs2.next()) {
+				wrate = rs2.getInt("wrate");
+				drate = rs2.getInt("drate");
+				hrate = rs2.getInt("hrate");
+				wirate = rs2.getInt("wirate");
+				dirate = rs2.getInt("dirate");
+				hirate = rs2.getInt("hirate");
+			}
+
+			ArrayList<String> title2 = new ArrayList<>();
+			title2.add("Rates: ");
+			result.add(spacing);
+			result.add(title2);
+			result.add(spacing);
+			ArrayList<String> columnRow2 = new ArrayList<>();
+			ArrayList<String> dataRow2 = new ArrayList<>();
+			columnRow2.add("Weekly rate");
+			columnRow2.add("Daily rate");
+			columnRow2.add("Hourly rate");
+			columnRow2.add("Weekly insurance rate");
+			columnRow2.add("Daily insurance rate");
+			columnRow2.add("Hourly insurance rate");
+			dataRow2.add(Integer.toString(wrate));
+			dataRow2.add(Integer.toString(drate));
+			dataRow2.add(Integer.toString(hrate));
+			dataRow2.add(Integer.toString(wirate));
+			dataRow2.add(Integer.toString(dirate));
+			dataRow2.add(Integer.toString(hirate));
+			result.add(columnRow2);
+			result.add(dataRow2);
+
+			long diffMs = (currentDate.getTime() - fromDate.getTime());
+			long diffWeek = (diffMs / (1000 * 60 * 60 * 24 * 7));
+			long diffDay = (diffMs / (1000 * 60 * 60 * 24) % 7);
+			long diffHour = (diffMs / (1000 * 60 * 60) % 24);
+			ArrayList<String> costTitleRow = new ArrayList<>();
+			costTitleRow.add("Total cost for: " + diffWeek + " weeks " + diffDay + " days " + diffHour + " hours");
+			result.add(spacing);
+			result.add(costTitleRow);
+			result.add(spacing);
+			long wcost = (wrate + wirate) * diffWeek;
+			long dcost = (drate + dirate) * diffDay;
+			long hcost = (hrate + hirate) * diffHour;
+			int totalCost = (int) (wcost + dcost + hcost);
+			ArrayList<String> weekCostRow = new ArrayList<>();
+			weekCostRow.add("Weekly rate applied cost: " + wcost);
+			ArrayList<String> dayCostRow = new ArrayList<>();
+			dayCostRow.add("Daily rate applied cost: " + dcost);
+			ArrayList<String> hourCostRow = new ArrayList<>();
+			hourCostRow.add("Hourly rate applied cost: " + hcost);
+			ArrayList<String> totalCostRow = new ArrayList<>();
+			totalCostRow.add("totalCost: " + totalCost);
+			result.add(weekCostRow);
+			result.add(dayCostRow);
+			result.add(hourCostRow);
+			result.add(totalCostRow);
+
+			insertReturn(rid, currentDate, afterOdometer, fulltank, totalCost);
+			updateVehicle(vlicense, afterOdometer);
+			ps1.close();
+			rs1.close();
+			ps2.close();
+			rs2.close();
+		} catch (SQLException e) {
+			System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	private void insertReturn(int rid, Date returnTime, int odometer, boolean fulltank, int payment) {
+		try {
+			PreparedStatement ps = connection.prepareStatement("INSERT INTO Return VALUES (?,?,?,?,?)");
+			ps.setInt(1, rid);
+			ps.setDate(2, new java.sql.Date(returnTime.getTime()));
+			ps.setInt(3, odometer);
+			ps.setString(4, Boolean.toString(fulltank));
+			ps.setInt(5, payment);
+
+			ps.executeUpdate();
+			connection.commit();
+
+			ps.close();
+		} catch (SQLException e) {
+			System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+			rollbackConnection();
+		}
+	}
+
+	private String getVtname(int confNo) {
+		String vtname = "";
+		try {
+			PreparedStatement ps = connection.prepareStatement("SELECT vtname FROM Reservation WHERE confNo = ?");
+			ps.setInt(1, confNo);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				vtname = rs.getString("vtname");
+			}
+			ps.close();
+			rs.close();
+		} catch (SQLException e) {
+			System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+		}
+		return vtname;
+	}
+
+	private void updateVehicle(String vlicense, int odometer) {
+		try {
+			PreparedStatement ps = connection.prepareStatement("UPDATE Vehicle SET status = 'available', odometer = ? WHERE vlicense = ?");
+			ps.setInt(1, odometer);
+			ps.setString(2, vlicense);
+			int rowCount = ps.executeUpdate();
+			if (rowCount == 0) {
+				System.out.println(WARNING_TAG + " Vehicle " + vlicense + " does not exist!");
+			}
+			connection.commit();
+			ps.close();
+		} catch (SQLException e) {
+			System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+			rollbackConnection();
+		}
+	}
+
 	public ArrayList<ArrayList<String>> generateRentalsReport(String reportDate){
 		String FROM_WHERE = "FROM Rental, Vehicle WHERE Rental.vlicense = Vehicle.vlicense AND TRUNC(fromDate) = TO_DATE(?, 'DD-MON-YYYY')";
 		return generateReport(reportDate, null, null, FROM_WHERE, "rentals");
@@ -46,7 +251,10 @@ public class DatabaseConnectionHandler {
 	public ArrayList<ArrayList<String>> generateRentalsBranchReport(String reportDate, String location, String city){
 		String FROM_WHERE = "FROM Rental, Vehicle WHERE Rental.vlicense = Vehicle.vlicense AND TRUNC(fromDate) = TO_DATE(?, 'DD-MON-YYYY') AND location = ? AND city = ?";
 		if (!isThereBranch(location, city)) {
-			return null;
+			ArrayList<ArrayList<String>> result = new ArrayList<>();
+			ArrayList<String> temp = new ArrayList<>();
+			temp.add("ERROR: The entered branch does not exist.");
+			return result;
 		} else {
 			return generateReport(reportDate, location, city, FROM_WHERE, "rentals");
 		}
@@ -59,7 +267,10 @@ public class DatabaseConnectionHandler {
 	public ArrayList<ArrayList<String>> generateReturnsBranchReport(String reportDate, String location, String city){
 		String FROM_WHERE = "FROM Rental, Return, Vehicle WHERE Rental.vlicense = Vehicle.vlicense AND Rental.rid = Return.rid AND TRUNC(returnTime) = TO_DATE(?, 'DD-MON-YYYY') AND location = ? AND city = ?";
 		if (!isThereBranch(location, city)) {
-			return null;
+			ArrayList<ArrayList<String>> result = new ArrayList<>();
+			ArrayList<String> temp = new ArrayList<>();
+			temp.add("ERROR: The entered branch does not exist.");
+			return result;
 		} else {
 			return generateReport(reportDate, location, city, FROM_WHERE, "returns");
 		}
@@ -75,7 +286,7 @@ public class DatabaseConnectionHandler {
 			isForBranch = true;
 		}
 		String totalRevenue = " ";
-		if (reportName == "returns") {
+		if (reportName.equals("returns")) {
 			totalRevenue = ", SUM(payment) AS revenue ";
 		}
 		String allVehicles = "SELECT Vehicle.vlicense, make, model, productionYear, color, Vehicle.odometer, status, vtname, location, city " + FROM_WHERE;

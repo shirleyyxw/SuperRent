@@ -5,9 +5,9 @@ public class ReturnModel {
     private final String date;
     private final int odometer;
     private final boolean fulltank;
-    private final float value;
+    private final int value;
 
-    public ReturnModel(int rid, String date, int odometer, boolean fulltank, float value) {
+    public ReturnModel(int rid, String date, int odometer, boolean fulltank, int value) {
         this.rid = rid;
         this.date = date;
         this.odometer = odometer;
@@ -31,7 +31,7 @@ public class ReturnModel {
         return fulltank;
     }
 
-    public float getValue() {
+    public int getValue() {
         return value;
     }
 }

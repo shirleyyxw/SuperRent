@@ -61,10 +61,10 @@ Insert into Rental values(10005, 'ABC-113', 1000005, 5600, 'Visa', 567890, TO_DA
 Insert into Rental values(10006, 'ABC-118', 1000007, 253749, 'MasterCard', 908765, TO_DATE('15-JAN-2023', 'DD-MON-YYYY'),  TO_DATE('01-OCT-2019 20:00:00', 'DD-MON-YYYY HH24:MI:SS'), TO_DATE('10-OCT-2019 20:00:00', 'DD-MON-YYYY HH24:MI:SS'), 107);
 Insert into Rental values(10007, 'ABC-119', 1000005, 253749, 'Visa', 567890, TO_DATE('15-JAN-2023', 'DD-MON-YYYY'), TO_DATE('01-OCT-2019 14:00:00', 'DD-MON-YYYY HH24:MI:SS'), TO_DATE('10-OCT-2019 14:00:00', 'DD-MON-YYYY HH24:MI:SS'), 113);
 
-Insert into Return values(10004, TO_DATE('10-OCT-2019 20:00:00', 'DD-MON-YYYY HH24:MI:SS'), 234600, 'True', 740);
-Insert into Return values(10005, TO_DATE('10-OCT-2019 14:00:00', 'DD-MON-YYYY HH24:MI:SS'), 6000, 'True', 830);
-Insert into Return values(10006, TO_DATE('10-OCT-2019 20:00:00', 'DD-MON-YYYY HH24:MI:SS'), 250000, 'True', 800);
-Insert into Return values(10007, TO_DATE('10-OCT-2019 14:00:00', 'DD-MON-YYYY HH24:MI:SS'), 7800, 'True', 550);
+Insert into Return values(10004, TO_DATE('10-OCT-2019 20:00:00', 'DD-MON-YYYY HH24:MI:SS'), 234600, 'true', 740);
+Insert into Return values(10005, TO_DATE('10-OCT-2019 14:00:00', 'DD-MON-YYYY HH24:MI:SS'), 6000, 'true', 830);
+Insert into Return values(10006, TO_DATE('10-OCT-2019 20:00:00', 'DD-MON-YYYY HH24:MI:SS'), 250000, 'true', 800);
+Insert into Return values(10007, TO_DATE('10-OCT-2019 14:00:00', 'DD-MON-YYYY HH24:MI:SS'), 7800, 'true', 550);
 
 commit work;
 

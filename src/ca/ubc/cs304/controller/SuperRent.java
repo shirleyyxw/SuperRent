@@ -12,6 +12,7 @@ import ca.ubc.cs304.ui.TerminalTransactions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * This is the main controller class that will orchestrate everything.
@@ -46,33 +47,46 @@ public class SuperRent implements LoginWindowDelegate, TerminalTransactionsDeleg
         } else {
             loginWindow.handleLoginFailed();
 
-            if (loginWindow.hasReachedMaxLoginAttempts()) {
-                loginWindow.dispose();
-                System.out.println("You have exceeded your number of allowed attempts");
-                System.exit(-1);
-            }
-        }
-    }
-    public void generateRentalsReport(String date){
-        printReport(dbHandler.generateRentalsReport(date), "Daily Rentals Report:");
-    }
+			if (loginWindow.hasReachedMaxLoginAttempts()) {
+				loginWindow.dispose();
+				System.out.println("You have exceeded your number of allowed attempts");
+				System.exit(-1);
+			}
+		}
+	}
 
-    public void generateRentalsBranchReport(String date, String location, String city){
-        printReport(dbHandler.generateRentalsBranchReport(date, location, city), "Daily Rentals for Branch Report:");
-    }
+	public void returnVehicle(String vlicense, int odometer, boolean fulltank, String currentDateStr, Date currentDate) {
+		print(dbHandler.returnVehicle(vlicense, odometer, fulltank, currentDateStr, currentDate), null);
+	}
 
-    public void generateReturnsReport(String date){
-        printReport(dbHandler.generateReturnsReport(date), "Daily Returns Report:");
-    }
+	public void generateRentalsReport(String date){
+		print(dbHandler.generateRentalsReport(date), "Daily Rentals Report:");
+	}
 
-    public void generateReturnsBranchReport(String date, String location, String city){
-        printReport(dbHandler.generateReturnsBranchReport(date, location, city), "Daily Returns for Branch Report:");
-    }
+	public void generateRentalsBranchReport(String date, String location, String city){
+		print(dbHandler.generateRentalsBranchReport(date, location, city), "Daily Rentals for Branch Report:");
+	}
 
-    // helper method for printing reports
-    // prints error message if the requested branch does not exist
-    private void printReport(ArrayList<ArrayList<String>> result, String reportName) {
+	public void generateReturnsReport(String date){
+		print(dbHandler.generateReturnsReport(date), "Daily Returns Report:");
+	}
+
+	public void generateReturnsBranchReport(String date, String location, String city){
+		print(dbHandler.generateReturnsBranchReport(date, location, city), "Daily Returns for Branch Report:");
+	}
+
+	// helper method for printing
+	private void print(ArrayList<ArrayList<String>> result, String reportName) {
         System.out.println();
+        if (reportName != null) {
+			System.out.print(reportName);
+		}
+		for(int i = 0; i < result.size(); i++) {
+			System.out.println();
+			for(int j = 0; j < result.get(i).size(); j++) {
+				System.out.printf("%-25s", result.get(i).get(j));
+			}
+		}
         if (result == null) {
             System.out.print("Error: The entered branch does not exist.");
         } else {
@@ -262,4 +276,3 @@ public class SuperRent implements LoginWindowDelegate, TerminalTransactionsDeleg
         superRent.start();
     }
 }
-
