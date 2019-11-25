@@ -1,6 +1,9 @@
 package ca.ubc.cs304.database;
 
 import ca.ubc.cs304.model.BranchModel;
+import ca.ubc.cs304.model.CustomerModel;
+import ca.ubc.cs304.model.ReservationModel;
+import ca.ubc.cs304.model.VehicleModel;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,7 +15,7 @@ public class DatabaseConnectionHandler {
 	private static final String ORACLE_URL = "jdbc:oracle:thin:@localhost:1522:stu";
 	private static final String EXCEPTION_TAG = "[EXCEPTION]";
 	private static final String WARNING_TAG = "[WARNING]";
-	
+
 	private Connection connection = null;
 	
 	public DatabaseConnectionHandler() {
@@ -374,6 +377,188 @@ public class DatabaseConnectionHandler {
 			rollbackConnection();
 		}	
 	}
+
+    //This is for viewing the number of available vehicles
+    public int countAvailableVehicles(String vtname, String location, String city, String startTime) {
+        String sqlQuery = getCountAvailableVehiclesQuery(vtname, location, city, startTime);
+        int result = -1;
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlQuery);
+            rs.next();
+            result = rs.getInt(1);
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+        }
+        return result;
+    }
+
+    //After viewing the number of available vehicles, customer has the option to display details of available vehicles
+    public VehicleModel[] displayAvailableVehicles(String vtname, String location, String city, String startTime) {
+        ArrayList<VehicleModel> result = new ArrayList<VehicleModel>();
+        String sqlQuery = getCountAvailableVehiclesQuery(vtname, location, city, startTime);
+        //Instead of the number of available vehicles, we want the details of available vehicles
+        sqlQuery = sqlQuery.replace("COUNT(*)", "*");
+
+        try{
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlQuery);
+
+            while(rs.next()) {
+                VehicleModel model = new VehicleModel(rs.getString("vlicense"),
+                        rs.getString("make"),
+                        rs.getString("model"),
+                        rs.getInt("productionYear"),
+                        rs.getString("color"),
+                        rs.getInt("odometer"),
+                        rs.getString("status"),
+                        rs.getString("vtname"),
+                        rs.getString("location"),
+                        rs.getString("city"));
+                result.add(model);
+            }
+            rs.close();
+            stmt.close();
+
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+        }
+        return result.toArray(new VehicleModel[result.size()]);
+    }
+
+
+    // Helper function to form the SQL query for counting available vehicles
+    private String getCountAvailableVehiclesQuery(String vtname, String location, String city, String startTime) {
+        String sqlQuery;
+        if (startTime == null) {
+            sqlQuery = "SELECT COUNT(*) FROM Vehicle WHERE status = 'available'";
+            if (vtname != null) {
+                vtname = "\'" + vtname + '\'';
+                sqlQuery = sqlQuery + " AND vtname=" + vtname;
+            }
+            if (location != null) {
+                location = '\'' + location + '\'';
+                sqlQuery = sqlQuery + " AND location=" + location;
+            } if (city != null) {
+                city = '\'' + city + '\'';
+                sqlQuery = sqlQuery + " AND city=" + city;
+            }
+        } else {
+            startTime = "TO_DATE(" + '\'' + startTime + '\'' + ',' + '\'' + "DD-MON-YYYY HH24:MI:SS" + '\'' +')';
+            // if the customer provides a startTime, find vehicles that are returned before the startTime
+            if (vtname != null && location == null && city == null) {
+                vtname = '\'' + vtname + '\'';
+                sqlQuery = "SELECT COUNT(*) FROM Vehicle WHERE (status = 'available' AND vtname=" + vtname + ")" + "OR (vtname=" + vtname + " AND status='rented' AND vlicense IN (SELECT vlicense FROM Rental WHERE toDate<" + startTime + "))";
+            }
+            else if (vtname != null && location != null && city == null) {
+                vtname = '\'' + vtname + '\'';
+                location = '\'' + location + '\'';
+                sqlQuery = "SELECT COUNT(*) FROM Vehicle WHERE (status = 'available' AND vtname=" + vtname + " AND location=" + location + ")" + "OR (vtname=" + vtname + " AND location=" + location + " AND status='rented' AND vlicense IN (SELECT vlicense FROM Rental WHERE toDate<" + startTime + "))";
+            }
+            else if (vtname != null && location != null && city != null) {
+                vtname = '\'' + vtname + '\'';
+                location = '\'' + location + '\'';
+                city = '\'' + city + '\'';
+                sqlQuery = "SELECT COUNT(*) FROM Vehicle WHERE (status = 'available' AND vtname=" + vtname + " AND location=" + location + " AND city=" + city + ")" + "OR (vtname=" + vtname + " AND location=" + location + " AND city=" + city + " AND status='rented' AND vlicense IN (SELECT vlicense FROM Rental WHERE toDate<" + startTime + "))";
+            }
+            else if (vtname == null && location != null && city == null) {
+                location = '\'' + location + '\'';
+                sqlQuery = "SELECT COUNT(*) FROM Vehicle WHERE (status = 'available' AND location=" + location + ")" + "OR (location=" + location + " AND status='rented' AND vlicense IN (SELECT vlicense FROM Rental WHERE toDate<" + startTime + "))";
+            }
+            else if (vtname == null && location != null && city != null) {
+                location = '\'' + location + '\'';
+                city = '\'' + city + '\'';
+                sqlQuery = "SELECT COUNT(*) FROM Vehicle WHERE (status = 'available' AND location=" + location + " AND city=" + city + ")" + "OR (location=" + location + " AND city=" + city + " AND status='rented' AND vlicense IN (SELECT vlicense FROM Rental WHERE toDate<" + startTime + "))";
+            }
+            else if (vtname == null && location == null && city != null) {
+                city = '\'' + city + '\'';
+                sqlQuery = "SELECT COUNT(*) FROM Vehicle WHERE (status = 'available' AND city=" + city + ")" + "OR (city=" + city + " AND status='rented' AND vlicense IN (SELECT vlicense FROM Rental WHERE toDate<" + startTime + "))";
+            } else {
+                vtname = '\'' + vtname + '\'';
+                city = '\'' + city + '\'';
+                sqlQuery = "SELECT COUNT(*) FROM Vehicle WHERE (status = 'available' AND vtname=" + vtname + " AND city=" + city + ")" + "OR (vtname=" + vtname + " AND city=" + city + " AND status='rented' AND vlicense IN (SELECT vlicense FROM Rental WHERE toDate<" + startTime + "))";
+            }
+        }
+        return sqlQuery;
+    }
+
+    // Given the dlicense, check if customer is in the database, return 0 if the no customer with the given dlicense is found in database
+    public int findCustomer(int dlicense){
+	    int result = -1;
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) FROM Customer WHERE dlicense = ?");
+            ps.setInt(1, dlicense);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            result = rs.getInt(1);
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+        }
+        return result;
+    }
+
+    // Insert new customer tuple into Customer table
+    public void addNewCustomer(CustomerModel model){
+        try {
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO Customer VALUES (?,?,?,?)");
+            ps.setInt(1, model.getDlicense());
+            ps.setString(2, model.getCellphone());
+            ps.setString(3, model.getName());
+            ps.setString(4, model.getAddress());
+
+            ps.executeUpdate();
+            connection.commit();
+
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+            rollbackConnection();
+        }
+    }
+
+    public ReservationModel reserveVehicle(String vtname, int dlicense, String fromDate, String toDate){
+	    int confNo = generateConfNoCounter();
+	    if (confNo == -1) {
+            System.out.println("Error in generating confirmation number.");
+        }
+	    ReservationModel model = new ReservationModel(confNo, vtname, dlicense, fromDate, toDate);
+        try{
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO Reservation VALUES (?,?,?,TO_DATE(?, 'DD-MON-YYYY HH24:MI:SS'), TO_DATE(?, 'DD-MON-YYYY HH24:MI:SS'))");
+            ps.setInt(1, model.getConfNo());
+            ps.setString(2,model.getVtname());
+            ps.setInt(3, model.getDlicense());
+            ps.setString(4, model.getFromDate());
+            ps.setString(5,model.getToDate());
+
+            ps.executeUpdate();
+            connection.commit();
+
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+            rollbackConnection();
+        }
+        return model;
+    }
+
+    private int generateConfNoCounter(){
+        int counter = -1;
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT MAX(confNo) AS counter FROM Reservation");
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            counter = rs.getInt("counter");
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage() + "1");
+        }
+        return ++counter;
+    }
+
+
+
 	
 	public boolean login(String username, String password) {
 		try {

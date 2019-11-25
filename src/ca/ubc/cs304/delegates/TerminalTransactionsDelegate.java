@@ -1,6 +1,7 @@
 package ca.ubc.cs304.delegates;
 
 import ca.ubc.cs304.model.BranchModel;
+import ca.ubc.cs304.model.CustomerModel;
 
 /**
  * This interface uses the delegation design pattern where instead of having
@@ -16,6 +17,11 @@ public interface TerminalTransactionsDelegate {
 	void insertBranch(BranchModel model);
 	void showBranch();
 	void updateBranch(int branchId, String name);
+	int countAvailableVehicles(String vtname, String location, String city, String startTime);
+	void displayAvailableVehicles(String vtname, String location, String city, String startTime);
+	int findCustomer(int dlicense);
+	void addNewCustomer(CustomerModel model);
+	void reserveVehicle(String vtname, int dlicense, String fromDate, String toDate, String location, String city);
 	void generateRentalsReport(String date);
 	void generateRentalsBranchReport(String date, String location, String city);
 	void generateReturnsReport(String date);
