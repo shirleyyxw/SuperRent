@@ -1,9 +1,6 @@
 package ca.ubc.cs304.database;
 
-import ca.ubc.cs304.model.BranchModel;
-import ca.ubc.cs304.model.CustomerModel;
-import ca.ubc.cs304.model.ReservationModel;
-import ca.ubc.cs304.model.VehicleModel;
+import ca.ubc.cs304.model.*;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -17,6 +14,7 @@ public class DatabaseConnectionHandler {
 	private static final String ORACLE_URL = "jdbc:oracle:thin:@localhost:1522:stu";
 	private static final String EXCEPTION_TAG = "[EXCEPTION]";
 	private static final String WARNING_TAG = "[WARNING]";
+
 
 	private Connection connection = null;
 	
@@ -768,10 +766,123 @@ public class DatabaseConnectionHandler {
         return ++counter;
     }
 
+    private int generateRidCounter(){
+        int rid = -1;
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT MAX(rid) AS counter FROM Rental");
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            rid = rs.getInt("counter");
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage() + "1");
+        }
+        return ++rid;
+    }
 
 
-	
-	public boolean login(String username, String password) {
+    public int findConfNo(int confNo){
+        int result = -1;
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) FROM Reservation WHERE confNo = ?");
+            ps.setInt(1, confNo);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+                result = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+        }
+        return result;
+    }
+
+    public int findDlicense(int confNo){
+        int result = -1;
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT dlicense FROM Reservation WHERE confNo = ?");
+            ps.setInt(1, confNo);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+                result = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+        }
+        return result;
+    }
+
+    public String findVtName(int confNo) {
+        String result = "";
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT vtname FROM Reservation WHERE confNo = ?");
+            ps.setInt(1, confNo);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                result = rs.getString(1);
+            }
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+        }
+        return result;
+    }
+
+    public RentalModel handleRent(String vlicense, int dlicense, int odometer, String cardName, int cardNo, String expDate, String fromDate, String toDate, int confNo){
+        int rid = generateRidCounter();
+        if (rid == -1) {
+            System.out.println("Error in generating Rid.");
+        }
+
+        RentalModel model = new RentalModel(rid, vlicense, dlicense, odometer, cardName, cardNo, expDate, fromDate, toDate, confNo);
+        try {
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO Rental VALUES (?,?,?,?,?,?,TO_DATE(?, 'DD-MON-YYYY'), TO_DATE(?, 'DD-MON-YYYY HH24:MI:SS'),TO_DATE(?, 'DD-MON-YYYY HH24:MI:SS'), ?)");
+
+            ps.setInt(1, model.getRid());
+            ps.setString(2, model.getVlicense());
+            ps.setInt(3, model.getDlicense());
+            ps.setInt(4, model.getOdometer());
+            ps.setString(5, model.getCardName());
+            ps.setInt(6, model.getCardNo());
+            ps.setString(7, model.getExpDate());
+            ps.setString(8, model.getFromDate());
+            ps.setString(9,model.getToDate());
+            ps.setInt(10, model.getConfNo());
+
+            ps.executeUpdate();
+            connection.commit();
+
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+            rollbackConnection();
+        }
+        return model;
+
+    }
+
+    public void updateVehicleStatus(String vlicense){
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE Vehicle SET status = 'rented' WHERE vlicense = ?");
+            ps.setString(1, vlicense);
+
+            int rowCount = ps.executeUpdate();
+            if (rowCount == 0) {
+                System.out.println(WARNING_TAG + " Vehicle " + vlicense + " does not exist!");
+            }
+
+            connection.commit();
+
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+            rollbackConnection();
+        }
+    }
+
+
+
+
+
+    public boolean login(String username, String password) {
 		try {
 			if (connection != null) {
 				connection.close();

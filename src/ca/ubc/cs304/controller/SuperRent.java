@@ -3,10 +3,7 @@ package ca.ubc.cs304.controller;
 import ca.ubc.cs304.database.DatabaseConnectionHandler;
 import ca.ubc.cs304.delegates.LoginWindowDelegate;
 import ca.ubc.cs304.delegates.TerminalTransactionsDelegate;
-import ca.ubc.cs304.model.BranchModel;
-import ca.ubc.cs304.model.CustomerModel;
-import ca.ubc.cs304.model.ReservationModel;
-import ca.ubc.cs304.model.VehicleModel;
+import ca.ubc.cs304.model.*;
 import ca.ubc.cs304.ui.LoginWindow;
 import ca.ubc.cs304.ui.TerminalTransactions;
 
@@ -194,6 +191,55 @@ public class SuperRent implements LoginWindowDelegate, TerminalTransactionsDeleg
 
         System.out.println();
     }
+
+    public int findConfNo(int confNo){
+        return dbHandler.findConfNo(confNo);
+    }
+
+    public int findDlicense(int confNo){
+        return dbHandler.findDlicense(confNo);
+    }
+
+    public String findVtName(int confNo) {
+        return dbHandler.findVtName(confNo);
+    }
+
+    public VehicleModel getFirstAvailableVehicle(String vtname, String location, String city, String fromDate) {
+        return dbHandler.displayAvailableVehicles(vtname, location,city, fromDate)[0];
+    }
+
+    public void handleRent(String vlicense, int dlicense, int odometer, String cardName, int cardNo, String expDate, String fromDate, String toDate, int confNo, String vtname, String location, String city){
+        RentalModel model = dbHandler.handleRent(vlicense, dlicense, odometer, cardName, cardNo, expDate, fromDate, toDate, confNo);
+        System.out.println();
+        System.out.println("Your rental is successful. The following is the information for this rental at "+ location + ", "+ city);
+        ArrayList<String> reservationAtrributes = new ArrayList<>(Arrays.asList("RID", "VLICENSE", "VTNAME", "DLICENSE", "ODOMETER", "CARDNAME", "CARDNO", "EXPDATE", "FROMDATE", "TODATE", "CONFNO"));
+        System.out.println();
+        for (int i = 0; i < reservationAtrributes.size(); i++) {
+            System.out.printf("%-25s", reservationAtrributes.get(i));
+        }
+
+        System.out.print("\n");
+        System.out.printf("%-25s", model.getRid());
+        System.out.printf("%-25s", model.getVlicense());
+        System.out.printf("%-25s", vtname);
+        System.out.printf("%-25s", model.getDlicense());
+        System.out.printf("%-25s", model.getOdometer());
+        System.out.printf("%-25s", model.getCardName());
+        System.out.printf("%-25s", model.getCardNo());
+        System.out.printf("%-25s", model.getExpDate());
+        System.out.printf("%-25s", model.getFromDate());
+        System.out.printf("%-25s", model.getToDate());
+        System.out.printf("%-25s", model.getConfNo());
+
+        System.out.println();
+    }
+
+    public void updateVehicleStatus(String vlicense){
+        dbHandler.updateVehicleStatus(vlicense);
+        System.out.println();
+        System.out.println("Status of vehicle with license plate " + vlicense + " is updated to rented");
+    }
+
 
     /**
      * TermainalTransactionsDelegate Implementation

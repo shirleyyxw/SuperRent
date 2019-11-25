@@ -3,6 +3,7 @@ package ca.ubc.cs304.ui;
 import ca.ubc.cs304.delegates.TerminalTransactionsDelegate;
 import ca.ubc.cs304.model.BranchModel;
 import ca.ubc.cs304.model.CustomerModel;
+import ca.ubc.cs304.model.VehicleModel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -240,7 +241,100 @@ public class TerminalTransactions {
 		}
 	}
 
-    private void handleRentOption() {}
+    private void handleRentOption() {
+        int confNo = INVALID_INPUT;
+        while (confNo == INVALID_INPUT) {
+            System.out.print("Please enter the confirmation number: ");
+            confNo = readInteger(false);
+        }
+
+        if (delegate.findConfNo(confNo) == 0){
+            System.out.println();
+            System.out.println("ERROR: Cannot find the confirmation number " + confNo + " in system.");
+            System.out.print("Please enter Y if you want to be make a reservation, otherwise enter N to go back to the main menu: ");
+            String YorN = readLine().trim();
+            if (!YorN.equals("Y")) return;
+            System.out.println();
+            this.handleReservationOption();
+
+            System.out.println();
+
+            System.out.print("If you want to proceed to rent a vehicle, please enter Y, otherwise enter N to get back to the main menu: ");
+            String YesOrNo = readLine().trim();
+            if (!YesOrNo.equals("Y")) return;
+            System.out.println();
+
+            confNo = INVALID_INPUT;
+            while (confNo == INVALID_INPUT) {
+                System.out.print("Please enter the confirmation number: ");
+                confNo = readInteger(false);
+            }
+        }
+
+
+        int dlicense = delegate.findDlicense(confNo);
+        String vtname = delegate.findVtName(confNo);
+
+        String city = null;
+        while (city == null || city.length() <= 0) {
+            System.out.print("Please enter the city you wish to pick up the vehicle: ");
+            city = readLine().trim();
+        }
+
+        String location = null;
+        while (location == null || location.length() <= 0) {
+            System.out.print("Please enter the location you wish to pick up the vehicle: ");
+            location = readLine().trim();
+        }
+
+        String pattern = "dd-MMM-YYYY HH:mm:ss";
+        String fromDate = null;
+        while (fromDate == null || fromDate.length() <= 0 || !isTimeInValidFormat(fromDate, pattern)) {
+            System.out.print("Please enter the time (DD-MON-YYYY HH24:MI:SS e.g. 01-JAN-2019 23:00:00) you wish to pick up the vehicle: ");
+            fromDate = readLine().trim();
+        }
+
+        String toDate = null;
+        while (toDate == null || toDate.length() <= 0 || !isTimeInValidFormat(toDate, pattern)) {
+            System.out.print("Please enter the time (DD-MON-YYYY HH24:MI:SS e.g. 01-JAN-2019 23:00:00) you wish to return the vehicle: ");
+            toDate = readLine().trim();
+        }
+
+        if ((delegate.countAvailableVehicles(vtname, location, city, fromDate)) == 0){
+            return;
+        }
+
+        VehicleModel model = delegate.getFirstAvailableVehicle(vtname, location, city, fromDate);
+
+
+        String cardName = null;
+        while (cardName == null || cardName.length() <= 0 || ! (cardName.equals("Visa") || cardName.equals("MasterCard"))) {
+            System.out.print("Please enter card type (only accept Visa or MasterCard): ");
+            cardName = readLine().trim();
+        }
+
+        String expDate = null;
+        while (expDate == null || expDate.length() <= 0 || !isTimeInValidFormat(expDate, "dd-MMM-YYYY")) {
+            System.out.print("Please enter card expiry date(DD-MON-YYYY): ");
+            expDate = readLine().trim();
+        }
+
+        int odometer = INVALID_INPUT;
+        while (odometer == INVALID_INPUT) {
+            System.out.print("Please enter the odometer: ");
+            odometer = readInteger(false);
+        }
+
+        int cardNo = INVALID_INPUT;
+        while (cardNo == INVALID_INPUT) {
+            System.out.print("Please enter the card number: ");
+            cardNo = readInteger(false);
+        }
+
+        delegate.handleRent(model.getVlicense(), dlicense, odometer, cardName, cardNo, expDate, fromDate, toDate, confNo, vtname, location, city);
+        delegate.updateVehicleStatus(model.getVlicense());
+
+    }
 
     private void handleReturnOption() {
 		String vlicense = null;

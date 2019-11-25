@@ -2,6 +2,7 @@ package ca.ubc.cs304.delegates;
 
 import ca.ubc.cs304.model.BranchModel;
 import ca.ubc.cs304.model.CustomerModel;
+import ca.ubc.cs304.model.VehicleModel;
 
 import java.util.Date;
 
@@ -18,7 +19,13 @@ public interface TerminalTransactionsDelegate {
 	void deleteBranch(int branchId);
 	void insertBranch(BranchModel model);
 	void showBranch();
-	void updateBranch(int branchId, String name);
+    int findConfNo(int confNo);
+    int findDlicense(int confNo);
+    String findVtName(int confNo);
+    VehicleModel getFirstAvailableVehicle(String vtname, String location, String city, String fromDate);
+    void handleRent(String vlicense, int dlicense, int odometer, String cardName, int cardNo, String expDate, String fromDate, String toDate, int confNo, String vtname, String location, String city);
+    void updateVehicleStatus(String vlicense);
+    void updateBranch(int branchId, String name);
 	void returnVehicle(String vlicense, int odometer, boolean fulltank, String currentDateStr, Date currentDate);
 	int countAvailableVehicles(String vtname, String location, String city, String startTime);
 	void displayAvailableVehicles(String vtname, String location, String city, String startTime);
