@@ -84,17 +84,6 @@ public class SuperRent implements LoginWindowDelegate, TerminalTransactionsDeleg
 				System.out.printf("%-25s", result.get(i).get(j));
 			}
 		}
-        if (result == null) {
-            System.out.print("Error: The entered branch does not exist.");
-        } else {
-            System.out.print(reportName);
-            for(int i = 0; i < result.size(); i++) {
-                System.out.println();
-                for(int j = 0; j < result.get(i).size(); j++) {
-                    System.out.printf("%-25s", result.get(i).get(j));
-                }
-            }
-        }
         System.out.println();
     }
 

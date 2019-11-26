@@ -14,14 +14,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * The class is only responsible for handling terminal text inputs. 
+ * The class is only responsible for handling terminal text inputs.
  */
 public class TerminalTransactions {
 	private static final String EXCEPTION_TAG = "[EXCEPTION]";
 	private static final String WARNING_TAG = "[WARNING]";
 	private static final int INVALID_INPUT = Integer.MIN_VALUE;
 	private static final int EMPTY_INPUT = 0;
-	
+
 	private BufferedReader bufferedReader = null;
 	private TerminalTransactionsDelegate delegate = null;
 
@@ -30,13 +30,13 @@ public class TerminalTransactions {
 
 	/**
 	 * Displays simple text interface
-	 */ 
+	 */
 	public void showMainMenu(TerminalTransactionsDelegate delegate) {
 		this.delegate = delegate;
-		
-	    bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+
+		bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 		int choice = INVALID_INPUT;
-		
+
 		while (choice != 9) {
 			System.out.println();
 			System.out.println("Customer:");
@@ -58,21 +58,21 @@ public class TerminalTransactions {
 
 			if (choice != INVALID_INPUT) {
 				switch (choice) {
-				case 1:  
-					handleViewVehiclesOption();
-					break;
-				case 2:  
-					handleReservationOption();
-					break;
-				case 3: 
-					handleRentOption();
-					break;
-				case 4:  
-					handleReturnOption();
-					break;
-				case 5:
-					handleRentalsReportOption();
-					break;
+					case 1:
+						handleViewVehiclesOption();
+						break;
+					case 2:
+						handleReservationOption();
+						break;
+					case 3:
+						handleRentOption();
+						break;
+					case 4:
+						handleReturnOption();
+						break;
+					case 5:
+						handleRentalsReportOption();
+						break;
 					case 6:
 						handleRentalsBranchReportOption();
 						break;
@@ -85,12 +85,12 @@ public class TerminalTransactions {
 					case 9:
 						handleQuitOption();
 						break;
-				default:
-					System.out.println(WARNING_TAG + " The number that you entered was not a valid option.");
-					break;
+					default:
+						System.out.println(WARNING_TAG + " The number that you entered was not a valid option.");
+						break;
 				}
 			}
-		}		
+		}
 	}
 
 	private void handleViewVehiclesOption() {
@@ -230,7 +230,7 @@ public class TerminalTransactions {
 				address = null;
 			}
 
-			System.out.println("Thank you " + name +  ", we will be adding you to our system.");
+			System.out.println("Thank you " + name + ", we will be adding you to our system.");
 			CustomerModel model = new CustomerModel(dlicense, cellphone, name, address);
 			delegate.addNewCustomer(model);
 
@@ -241,102 +241,102 @@ public class TerminalTransactions {
 		}
 	}
 
-    private void handleRentOption() {
-        int confNo = INVALID_INPUT;
-        while (confNo == INVALID_INPUT) {
-            System.out.print("Please enter the confirmation number: ");
-            confNo = readInteger(false);
-        }
+	private void handleRentOption() {
+		int confNo = INVALID_INPUT;
+		while (confNo == INVALID_INPUT) {
+			System.out.print("Please enter the confirmation number: ");
+			confNo = readInteger(false);
+		}
 
-        if (delegate.findConfNo(confNo) == 0){
-            System.out.println();
-            System.out.println("ERROR: Cannot find the confirmation number " + confNo + " in system.");
-            System.out.print("Please enter Y if you want to be make a reservation, otherwise enter N to go back to the main menu: ");
-            String YorN = readLine().trim();
-            if (!YorN.equals("Y")) return;
-            System.out.println();
-            this.handleReservationOption();
+		if (delegate.findConfNo(confNo) == 0) {
+			System.out.println();
+			System.out.println("ERROR: Cannot find the confirmation number " + confNo + " in system.");
+			System.out.print("Please enter Y if you want to be make a reservation, otherwise enter N to go back to the main menu: ");
+			String YorN = readLine().trim();
+			if (!YorN.equals("Y")) return;
+			System.out.println();
+			this.handleReservationOption();
 
-            System.out.println();
+			System.out.println();
 
-            System.out.print("If you want to proceed to rent a vehicle, please enter Y, otherwise enter N to get back to the main menu: ");
-            String YesOrNo = readLine().trim();
-            if (!YesOrNo.equals("Y")) return;
-            System.out.println();
+			System.out.print("If you want to proceed to rent a vehicle, please enter Y, otherwise enter N to get back to the main menu: ");
+			String YesOrNo = readLine().trim();
+			if (!YesOrNo.equals("Y")) return;
+			System.out.println();
 
-            confNo = INVALID_INPUT;
-            while (confNo == INVALID_INPUT) {
-                System.out.print("Please enter the confirmation number: ");
-                confNo = readInteger(false);
-            }
-        }
-
-
-        int dlicense = delegate.findDlicense(confNo);
-        String vtname = delegate.findVtName(confNo);
-
-        String city = null;
-        while (city == null || city.length() <= 0) {
-            System.out.print("Please enter the city you wish to pick up the vehicle: ");
-            city = readLine().trim();
-        }
-
-        String location = null;
-        while (location == null || location.length() <= 0) {
-            System.out.print("Please enter the location you wish to pick up the vehicle: ");
-            location = readLine().trim();
-        }
-
-        String pattern = "dd-MMM-YYYY HH:mm:ss";
-        String fromDate = null;
-        while (fromDate == null || fromDate.length() <= 0 || !isTimeInValidFormat(fromDate, pattern)) {
-            System.out.print("Please enter the time (DD-MON-YYYY HH24:MI:SS e.g. 01-JAN-2019 23:00:00) you wish to pick up the vehicle: ");
-            fromDate = readLine().trim();
-        }
-
-        String toDate = null;
-        while (toDate == null || toDate.length() <= 0 || !isTimeInValidFormat(toDate, pattern)) {
-            System.out.print("Please enter the time (DD-MON-YYYY HH24:MI:SS e.g. 01-JAN-2019 23:00:00) you wish to return the vehicle: ");
-            toDate = readLine().trim();
-        }
-
-        if ((delegate.countAvailableVehicles(vtname, location, city, fromDate)) == 0){
-            return;
-        }
-
-        VehicleModel model = delegate.getFirstAvailableVehicle(vtname, location, city, fromDate);
+			confNo = INVALID_INPUT;
+			while (confNo == INVALID_INPUT) {
+				System.out.print("Please enter the confirmation number: ");
+				confNo = readInteger(false);
+			}
+		}
 
 
-        String cardName = null;
-        while (cardName == null || cardName.length() <= 0 || ! (cardName.equals("Visa") || cardName.equals("MasterCard"))) {
-            System.out.print("Please enter card type (only accept Visa or MasterCard): ");
-            cardName = readLine().trim();
-        }
+		int dlicense = delegate.findDlicense(confNo);
+		String vtname = delegate.findVtName(confNo);
 
-        String expDate = null;
-        while (expDate == null || expDate.length() <= 0 || !isTimeInValidFormat(expDate, "dd-MMM-YYYY")) {
-            System.out.print("Please enter card expiry date(DD-MON-YYYY): ");
-            expDate = readLine().trim();
-        }
+		String city = null;
+		while (city == null || city.length() <= 0) {
+			System.out.print("Please enter the city you wish to pick up the vehicle: ");
+			city = readLine().trim();
+		}
 
-        int odometer = INVALID_INPUT;
-        while (odometer == INVALID_INPUT) {
-            System.out.print("Please enter the odometer: ");
-            odometer = readInteger(false);
-        }
+		String location = null;
+		while (location == null || location.length() <= 0) {
+			System.out.print("Please enter the location you wish to pick up the vehicle: ");
+			location = readLine().trim();
+		}
 
-        int cardNo = INVALID_INPUT;
-        while (cardNo == INVALID_INPUT) {
-            System.out.print("Please enter the card number: ");
-            cardNo = readInteger(false);
-        }
+		String pattern = "dd-MMM-YYYY HH:mm:ss";
+		String fromDate = null;
+		while (fromDate == null || fromDate.length() <= 0 || !isTimeInValidFormat(fromDate, pattern)) {
+			System.out.print("Please enter the time (DD-MON-YYYY HH24:MI:SS e.g. 01-JAN-2019 23:00:00) you wish to pick up the vehicle: ");
+			fromDate = readLine().trim();
+		}
 
-        delegate.handleRent(model.getVlicense(), dlicense, odometer, cardName, cardNo, expDate, fromDate, toDate, confNo, vtname, location, city);
-        delegate.updateVehicleStatus(model.getVlicense());
+		String toDate = null;
+		while (toDate == null || toDate.length() <= 0 || !isTimeInValidFormat(toDate, pattern)) {
+			System.out.print("Please enter the time (DD-MON-YYYY HH24:MI:SS e.g. 01-JAN-2019 23:00:00) you wish to return the vehicle: ");
+			toDate = readLine().trim();
+		}
 
-    }
+		if ((delegate.countAvailableVehicles(vtname, location, city, fromDate)) == 0) {
+			return;
+		}
 
-    private void handleReturnOption() {
+		VehicleModel model = delegate.getFirstAvailableVehicle(vtname, location, city, fromDate);
+
+
+		String cardName = null;
+		while (cardName == null || cardName.length() <= 0 || !(cardName.equals("Visa") || cardName.equals("MasterCard"))) {
+			System.out.print("Please enter card type (only accept Visa or MasterCard): ");
+			cardName = readLine().trim();
+		}
+
+		String expDate = null;
+		while (expDate == null || expDate.length() <= 0 || !isTimeInValidFormat(expDate, "dd-MMM-YYYY")) {
+			System.out.print("Please enter card expiry date(DD-MON-YYYY): ");
+			expDate = readLine().trim();
+		}
+
+		int odometer = INVALID_INPUT;
+		while (odometer == INVALID_INPUT) {
+			System.out.print("Please enter the odometer: ");
+			odometer = readInteger(false);
+		}
+
+		int cardNo = INVALID_INPUT;
+		while (cardNo == INVALID_INPUT) {
+			System.out.print("Please enter the card number: ");
+			cardNo = readInteger(false);
+		}
+
+		delegate.handleRent(model.getVlicense(), dlicense, odometer, cardName, cardNo, expDate, fromDate, toDate, confNo, vtname, location, city);
+		delegate.updateVehicleStatus(model.getVlicense());
+
+	}
+
+	private void handleReturnOption() {
 		String vlicense = null;
 		while (vlicense == null || vlicense.length() <= 0) {
 			System.out.print("Please enter the license plate number for the vehicle you wish to return: ");
@@ -375,11 +375,11 @@ public class TerminalTransactions {
 		delegate.generateRentalsReport(date);
 	}
 
-    private void handleRentalsBranchReportOption() {
+	private void handleRentalsBranchReportOption() {
 		String date = getDateForReport("rentals for branch");
-	    String[] result = getCityAndLocation("rentals");
-        delegate.generateRentalsBranchReport(date, result[0], result[1]);
-    }
+		String[] result = getCityAndLocation("rentals");
+		delegate.generateRentalsBranchReport(date, result[0], result[1]);
+	}
 
 	private void handleReturnsReportOption() {
 		String date = getDateForReport("returns");
@@ -388,12 +388,12 @@ public class TerminalTransactions {
 
 	private void handleReturnsBranchReportOption() {
 		String date = getDateForReport("returns for branch");
-        String[] result = getCityAndLocation("returns");
-        delegate.generateReturnsBranchReport(date, result[0], result[1]);
-    }
+		String[] result = getCityAndLocation("returns");
+		delegate.generateReturnsBranchReport(date, result[0], result[1]);
+	}
 
-    // helper method for report options to get the date of report
-    private String getDateForReport(String reportName) {
+	// helper method for report options to get the date of report
+	private String getDateForReport(String reportName) {
 		String date = null;
 		String pattern = "dd-MMM-YYYY";
 		while (date == null || date.length() <= 0 || !isTimeInValidFormat(date, pattern)) {
@@ -403,22 +403,22 @@ public class TerminalTransactions {
 		return date;
 	}
 
-    // helper method for handleRentalsBranchReportOption and handleReturnsBranchReportOption to get the branch
-    // return a string array with result[0] = location, result[1] = city
-    private String[] getCityAndLocation(String reportName) {
-        String city = null;
-        while (city == null || city.length() <= 0) {
-            System.out.print("Please enter the city of the branch you wish to generate " + reportName + " report for: ");
-            city = readLine().trim();
-        }
-        String location = null;
-        while (location == null || location.length() <= 0) {
-            System.out.print("Please enter the location of the branch you wish to generate " + reportName + " report for: ");
-            location = readLine().trim();
-        }
-        String[] result = {location, city};
-        return result;
-    }
+	// helper method for handleRentalsBranchReportOption and handleReturnsBranchReportOption to get the branch
+	// return a string array with result[0] = location, result[1] = city
+	private String[] getCityAndLocation(String reportName) {
+		String city = null;
+		while (city == null || city.length() <= 0) {
+			System.out.print("Please enter the city of the branch you wish to generate " + reportName + " report for: ");
+			city = readLine().trim();
+		}
+		String location = null;
+		while (location == null || location.length() <= 0) {
+			System.out.print("Please enter the location of the branch you wish to generate " + reportName + " report for: ");
+			location = readLine().trim();
+		}
+		String[] result = {location, city};
+		return result;
+	}
 
 	private void handleDeleteOption() {
 		int branchId = INVALID_INPUT;
@@ -430,50 +430,50 @@ public class TerminalTransactions {
 			}
 		}
 	}
-	
+
 	private void handleInsertOption() {
 		int id = INVALID_INPUT;
 		while (id == INVALID_INPUT) {
 			System.out.print("Please enter the branch ID you wish to insert: ");
 			id = readInteger(false);
 		}
-		
+
 		String name = null;
 		while (name == null || name.length() <= 0) {
 			System.out.print("Please enter the branch name you wish to insert: ");
 			name = readLine().trim();
 		}
-		
+
 		// branch address is allowed to be null so we don't need to repeatedly ask for the address
 		System.out.print("Please enter the branch address you wish to insert: ");
 		String address = readLine().trim();
 		if (address.length() == 0) {
 			address = null;
 		}
-		
+
 		String city = null;
 		while (city == null || city.length() <= 0) {
 			System.out.print("Please enter the branch city you wish to insert: ");
 			city = readLine().trim();
 		}
-		
+
 		int phoneNumber = INVALID_INPUT;
 		while (phoneNumber == INVALID_INPUT) {
 			System.out.print("Please enter the branch phone number you wish to insert: ");
 			phoneNumber = readInteger(true);
 		}
-		
+
 		BranchModel model = new BranchModel(address,
-											city,
-											id,
-											name,
-											phoneNumber);
+				city,
+				id,
+				name,
+				phoneNumber);
 		delegate.insertBranch(model);
 	}
-	
+
 	private void handleQuitOption() {
 		System.out.println("Good Bye!");
-		
+
 		if (bufferedReader != null) {
 			try {
 				bufferedReader.close();
@@ -481,17 +481,17 @@ public class TerminalTransactions {
 				System.out.println("IOException!");
 			}
 		}
-		
+
 		delegate.terminalTransactionsFinished();
 	}
-	
+
 	private void handleUpdateOption() {
 		int id = INVALID_INPUT;
 		while (id == INVALID_INPUT) {
 			System.out.print("Please enter the branch ID you wish to update: ");
 			id = readInteger(false);
 		}
-		
+
 		String name = null;
 		while (name == null || name.length() <= 0) {
 			System.out.print("Please enter the branch name you wish to update: ");
@@ -500,7 +500,7 @@ public class TerminalTransactions {
 
 		delegate.updateBranch(id, name);
 	}
-	
+
 	private int readInteger(boolean allowEmpty) {
 		String line = null;
 		int input = INVALID_INPUT;
@@ -518,7 +518,7 @@ public class TerminalTransactions {
 		}
 		return input;
 	}
-	
+
 	private String readLine() {
 		String result = null;
 		try {

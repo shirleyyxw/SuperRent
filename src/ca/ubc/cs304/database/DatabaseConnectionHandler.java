@@ -77,11 +77,7 @@ public class DatabaseConnectionHandler {
 				SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-YYYY HH:mm:ss");
 				formatter.setLenient(false);
 				fromDate = rs1.getTimestamp("fromDate");
-				System.out.print(fromDate + "\n");
 				fromDateStr = formatter.format(fromDate);
-				System.out.print(fromDateStr + "\n");
-				// fromDate = formatter.parse(fromDateStr, new ParsePosition(0));
-				// System.out.print(fromDate + "\n");
 				confNo = rs1.getInt("confNo");
 			}
 			String vtname = getVtname(confNo);
@@ -252,6 +248,7 @@ public class DatabaseConnectionHandler {
 			ArrayList<ArrayList<String>> result = new ArrayList<>();
 			ArrayList<String> temp = new ArrayList<>();
 			temp.add("ERROR: The entered branch does not exist.");
+			result.add(temp);
 			return result;
 		} else {
 			return generateReport(reportDate, location, city, FROM_WHERE, "rentals");
@@ -268,6 +265,7 @@ public class DatabaseConnectionHandler {
 			ArrayList<ArrayList<String>> result = new ArrayList<>();
 			ArrayList<String> temp = new ArrayList<>();
 			temp.add("ERROR: The entered branch does not exist.");
+			result.add(temp);
 			return result;
 		} else {
 			return generateReport(reportDate, location, city, FROM_WHERE, "returns");
@@ -313,11 +311,8 @@ public class DatabaseConnectionHandler {
 			}
 
 			ResultSet rsVehicles = psVehicles.executeQuery();
-			System.out.print("1");
 			ResultSet rsCat = psCat.executeQuery();
-			System.out.print("2");
 			ResultSet rsTotal = psTotal.executeQuery();
-			System.out.print("3");
 
 			// get info on ResultSet
 			ResultSetMetaData rsmdVehicles = rsVehicles.getMetaData();
