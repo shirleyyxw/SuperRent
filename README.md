@@ -1,4 +1,4 @@
-# CPSC304-SuperRent
+# SuperRent
 > SuperRent is a simple database system for a car rental campany using Java/Oracle. It can be used to track transactions performed by both customers and employees of the company, and generate various rental and return reports.  
 
 ## Table of contents
